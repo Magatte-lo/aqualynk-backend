@@ -1,0 +1,1 @@
+web: gunicorn aqualynk.wsgi:application
