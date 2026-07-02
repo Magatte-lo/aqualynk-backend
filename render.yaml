@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn aqualynk.wsgi:application"
+    startCommand: "gunicorn aqualynk.wsgi:application --access-logfile - --error-logfile - --log-level info --capture-output"
     envVars:
       - key: DEBUG
         value: "False"

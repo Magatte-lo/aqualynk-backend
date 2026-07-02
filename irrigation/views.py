@@ -127,27 +127,49 @@ def login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_data(request):
-    """GET /api/get_data/ - Retourne l'état + rafraîchit la météo automatiquement"""
+    """GET /api/get_data/ - Retourne l'etat + rafraichit la meteo automatiquement"""
+    import sys
     from datetime import timedelta
     from django.utils import timezone
 
     state = SystemState.get_instance()
 
-    # === RAFRAÎCHIR LA MÉTÉO SI VIEILLE OU INEXISTANTE ===
+    # Force le flush des logs sur Render
+    print(f"[GET_DATA] temp={state.temperature}, last_update={state.last_update}", flush=True)
+    sys.stdout.flush()
+
     needs_weather_refresh = (
         state.temperature == 0
         or state.last_update is None
         or (timezone.now() - state.last_update) > timedelta(minutes=10)
     )
 
+    print(f"[GET_DATA] needs_refresh={needs_weather_refresh}", flush=True)
+    sys.stdout.flush()
+
     if needs_weather_refresh:
-        weather = get_weather_data(state.latitude, state.longitude)
-        if weather.get("success"):
-            state.temperature = weather["temperature"]
-            state.rain_expected = weather["rain_expected"]
-            state.esp32_connected = True  # ← Marquer comme "connecté" (l'API répond)
-            state.save()
-            print(f"🌤️  Météo mise à jour : {state.temperature}°C, pluie : {state.rain_expected}")
+        try:
+            print(f"[METEO] Appel Open-Meteo lat={state.latitude} lon={state.longitude}", flush=True)
+            sys.stdout.flush()
+            weather = get_weather_data(state.latitude, state.longitude)
+            print(f"[METEO] Reponse: {weather}", flush=True)
+            sys.stdout.flush()
+
+            if weather and weather.get("success"):
+                state.temperature = weather["temperature"]
+                state.rain_expected = weather["rain_expected"]
+                state.esp32_connected = True
+                state.save()
+                print(f"[METEO] Sauvegarde OK: {state.temperature}C, pluie={state.rain_expected}", flush=True)
+                sys.stdout.flush()
+            else:
+                print(f"[METEO] Pas success dans la reponse: {weather}", flush=True)
+                sys.stdout.flush()
+        except Exception as e:
+            print(f"[METEO] ERREUR: {type(e).__name__}: {str(e)}", flush=True)
+            sys.stdout.flush()
+            import traceback
+            traceback.print_exc()
 
     return Response({
         "humidity": state.humidity,
