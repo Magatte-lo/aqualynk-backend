@@ -229,9 +229,9 @@ def update_sensor(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])  # ← NOUVEAU (pour ESP32)
 def get_pump(request):
-    """GET /api/get_pump/ - Retourne juste l'état de la pompe"""
+    """GET /api/get_pump/ - Retourne l'état de la pompe (accessible à l'ESP32)"""
     state = SystemState.get_instance()
     return Response({
         'pump_status': state.pump_status,
@@ -239,7 +239,6 @@ def get_pump(request):
         'threshold_min': state.threshold_min,
         'threshold_max': state.threshold_max,
     })
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
