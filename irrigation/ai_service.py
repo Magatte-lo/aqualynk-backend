@@ -21,7 +21,7 @@ def ask_aqualynk_ai(question, context=None):
         return "L'assistant IA n'est pas configure. Contactez l'administrateur."
 
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-2.0-flash-001')
 
         context_str = ""
         if context:
