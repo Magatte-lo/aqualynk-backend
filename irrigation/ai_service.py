@@ -225,7 +225,7 @@ QUESTION : {question}
 REPONSE :"""
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(
             prompt,
             request_options={"timeout": 25}
