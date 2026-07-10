@@ -58,7 +58,10 @@ Question de l'agriculteur : {question}
 
 Reponse :"""
 
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+    prompt,
+    request_options={"timeout": 25}  # Max 25 sec pour eviter les timeouts
+)
         return response.text.strip()
 
     except Exception as e:
