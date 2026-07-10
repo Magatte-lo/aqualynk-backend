@@ -227,9 +227,9 @@ REPONSE :"""
     try:
         model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(
-            prompt,
-            request_options={"timeout": 25}
-        )
+    prompt,
+    request_options={"timeout": 60}
+)
         answer = response.text.strip()
         print(f"[AI] Reponse Gemini OK", flush=True)
         return answer
